@@ -1,139 +1,12 @@
+// خدمة جلب الأخبار
 class NewsService {
     constructor() {
         this.cache = new Map();
         this.lastUpdate = null;
         this.isLoading = false;
-        
-        // إصلاح قراءة آخر تحديث من LocalStorage
-        this.initializeLastUpdate();
     }
 
-    // إصلاح تهيئة آخر تحديث
-    initializeLastUpdate() {
-        try {
-            const savedUpdate = localStorage.getItem('lastUpdate');
-            if (savedUpdate && savedUpdate !== 'null' && savedUpdate !== 'undefined') {
-                const date = new Date(savedUpdate);
-                if (!isNaN(date.getTime()) && date.getTime() > 0) {
-                    this.lastUpdate = date;
-                }
-            }
-        } catch (error) {
-            console.error('خطأ في تهيئة آخر تحديث:', error);
-        }
-    }
-// أضف هذه الدالة داخل class CryptoNewsApp
-
-displayNews(news, append = false) {
-    console.log('🔄 Displaying news:', news?.length || 0);
-    
-    const container = document.getElementById('newsContainer');
-    if (!container) {
-        console.error('❌ News container not found');
-        return;
-    }
-    
-    if (!append) {
-        container.innerHTML = '';
-    }
-    
-    if (!news || news.length === 0) {
-        container.innerHTML = `
-            <div class="empty-state">
-                <i class="fas fa-newspaper"></i>
-                <h3>لا توجد أخبار متاحة</h3>
-                <p>جاري تحميل الأخبار...</p>
-            </div>
-        `;
-        return;
-    }
-    
-    news.forEach((item, index) => {
-        const newsDiv = document.createElement('div');
-        newsDiv.className = 'news-item fade-in';
-        
-        const publishedDate = new Date(item.publishedAt || item.pubDate || Date.now());
-        const timeAgo = this.getTimeAgo ? this.getTimeAgo(publishedDate) : publishedDate.toLocaleDateString('ar-SA');
-        
-        newsDiv.innerHTML = `
-            <div class="news-source">${item.source || 'Unknown Source'}</div>
-            <h3 class="news-title">
-                <a href="${item.url || item.link || '#'}" target="_blank" rel="noopener noreferrer">
-                    ${item.title || 'No title available'}
-                </a>
-            </h3>
-            <p class="news-description">
-                ${item.description || item.summary || 'No description available'}
-            </p>
-            <div class="news-meta">
-                <span class="news-date">
-                    <i class="fas fa-clock"></i>
-                    ${timeAgo}
-                </span>
-                <div class="news-actions">
-                    <a href="${item.url || item.link || '#'}" target="_blank" class="btn btn-primary btn-sm">
-                        <i class="fas fa-external-link-alt"></i>
-                        Read More
-                    </a>
-                </div>
-            </div>
-        `;
-        
-        container.appendChild(newsDiv);
-    });
-    
-    console.log('✅ News displayed successfully');
-}
-
-// دالة مساعدة للوقت
-getTimeAgo(date) {
-    const now = new Date();
-    const diffTime = Math.abs(now - date);
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
-    if (diffDays === 1) return 'منذ يوم واحد';
-    if (diffDays < 7) return `منذ ${diffDays} أيام`;
-    if (diffDays < 30) return `منذ ${Math.ceil(diffDays / 7)} أسابيع`;
-    return date.toLocaleDateString('ar-SA');
-}
-
-    // إصلاح تحديث كاش الأخبار
-    updateNewsCache(allNews) {
-        this.cache.set('allNews', allNews);
-        // إنشاء تاريخ جديد صحيح
-        this.lastUpdate = new Date();
-        
-        // التأكد من الحفظ الصحيح
-        try {
-            localStorage.setItem('lastUpdate', this.lastUpdate.toISOString());
-            console.log('تم حفظ آخر تحديث:', this.lastUpdate.toISOString());
-        } catch (error) {
-            console.error('خطأ في حفظ آخر تحديث:', error);
-        }
-    }
-
-    // دالة للحصول على آخر تحديث بتنسيق صحيح
-    getFormattedLastUpdate() {
-        if (!this.lastUpdate || isNaN(this.lastUpdate.getTime())) {
-            return 'لم يتم التحديث بعد';
-        }
-        
-        const now = new Date();
-        const diffInMinutes = Math.floor((now - this.lastUpdate) / (1000 * 60));
-        
-        if (diffInMinutes < 1) {
-            return 'الآن';
-        } else if (diffInMinutes < 60) {
-            return `منذ ${diffInMinutes} دقيقة`;
-        } else if (diffInMinutes < 1440) {
-            const hours = Math.floor(diffInMinutes / 60);
-            return `منذ ${hours} ساعة`;
-        } else {
-            return this.lastUpdate.toLocaleString('ar-SA');
-        }
-    }
-
-    // جلب الأخبار من جميع المصادر مع إصلاح التحديث
+    // جلب الأخبار من جميع المصادر
     async fetchAllNews() {
         if (this.isLoading) return this.cache.get('allNews') || [];
         
@@ -141,6 +14,7 @@ getTimeAgo(date) {
         const allNews = [];
         
         try {
+            // جلب الأخبار من كل مصدر
             const promises = Object.entries(CONFIG.NEWS_SOURCES).map(
                 ([key, source]) => this.fetchFromSource(source)
             );
@@ -156,12 +30,16 @@ getTimeAgo(date) {
             // ترتيب الأخبار حسب التاريخ
             allNews.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
             
-            // تحديث الكاش مع إصلاح التاريخ
-            this.updateNewsCache(allNews);
+            // تخزين في الكاش
+            this.cache.set('allNews', allNews);
+            this.lastUpdate = new Date();
+            
+            // حفظ في التخزين المحلي
             this.saveToLocalStorage(allNews);
             
         } catch (error) {
             console.error('خطأ في جلب الأخبار:', error);
+            // محاولة تحميل من التخزين المحلي
             return this.loadFromLocalStorage();
         } finally {
             this.isLoading = false;
@@ -170,9 +48,10 @@ getTimeAgo(date) {
         return allNews;
     }
 
-    // إصلاح جلب الأخبار من مصدر واحد مع اتجاه النص
+    // جلب الأخبار من مصدر واحد
     async fetchFromSource(source) {
         try {
+            // استخدام RSS2JSON API
             const proxyUrl = CONFIG.RSS_PROXY_SERVICES[0];
             const response = await fetch(`${proxyUrl}${encodeURIComponent(source.rss)}`);
             
@@ -195,23 +74,13 @@ getTimeAgo(date) {
                 sourceColor: source.color,
                 thumbnail: item.thumbnail || item.enclosure?.link || null,
                 categories: item.categories || [],
-                id: this.generateId(item.link),
-                // إضافة اتجاه النص - الإنجليزية من اليسار لليمين
-                isEnglish: this.isEnglishContent(item.title, item.description),
-                textDirection: 'ltr' // فرض الاتجاه من اليسار لليمين للإنجليزية
+                id: this.generateId(item.link)
             }));
             
         } catch (error) {
             console.error(`خطأ في جلب أخبار ${source.name}:`, error);
             return [];
         }
-    }
-
-    // فحص إذا كان المحتوى باللغة الإنجليزية
-    isEnglishContent(title, description) {
-        const text = (title + ' ' + (description || '')).toLowerCase();
-        const arabicRegex = /[\u0600-\u06FF]/;
-        return !arabicRegex.test(text);
     }
 
     // تنظيف وصف الخبر
@@ -232,22 +101,15 @@ getTimeAgo(date) {
         return btoa(url).replace(/[^a-zA-Z0-9]/g, '').substring(0, 10);
     }
 
-    // إصلاح حفظ في التخزين المحلي
+    // حفظ في التخزين المحلي
     saveToLocalStorage(news) {
         try {
-            const now = new Date();
             const data = {
                 news: news,
-                timestamp: now.getTime(),
-                lastUpdateISO: now.toISOString()
+                timestamp: Date.now()
             };
-            
             localStorage.setItem(CONFIG.STORAGE_KEYS.NEWS_CACHE, JSON.stringify(data));
-            localStorage.setItem('lastUpdate', now.toISOString());
-            
-            // تحديث المتغير المحلي
-            this.lastUpdate = now;
-            
+            localStorage.setItem(CONFIG.STORAGE_KEYS.LAST_UPDATE, this.lastUpdate.toISOString());
         } catch (error) {
             console.error('خطأ في حفظ البيانات:', error);
         }
@@ -260,12 +122,6 @@ getTimeAgo(date) {
             if (!cached) return [];
             
             const data = JSON.parse(cached);
-            
-            // استعادة آخر تحديث
-            if (data.lastUpdateISO) {
-                this.lastUpdate = new Date(data.lastUpdateISO);
-            }
-            
             const age = Date.now() - data.timestamp;
             
             // التحقق من صلاحية الكاش
@@ -280,7 +136,7 @@ getTimeAgo(date) {
         return [];
     }
 
-    // باقي الدوال كما هي...
+    // جلب أسعار العملات من CoinGecko
     async fetchCryptoPrices() {
         try {
             const response = await fetch(
@@ -296,6 +152,7 @@ getTimeAgo(date) {
         }
     }
 
+    // البحث في الأخبار
     searchNews(news, query) {
         if (!query) return news;
         
@@ -307,11 +164,13 @@ getTimeAgo(date) {
         );
     }
 
+    // فلترة حسب المصدر
     filterBySource(news, source) {
         if (!source) return news;
         return news.filter(item => item.source === source);
     }
 
+    // الحصول على المصادر النشطة
     getActiveSources(news) {
         const sources = new Set();
         news.forEach(item => sources.add(item.source));
