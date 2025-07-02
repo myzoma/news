@@ -97,42 +97,105 @@ class NewsService {
     }
 
     // إصلاح جلب الأخبار من مصدر واحد مع اتجاه النص
-    async fetchFromSource(source) {
-        try {
-            const proxyUrl = CONFIG.RSS_PROXY_SERVICES[0];
-            const response = await fetch(`${proxyUrl}${encodeURIComponent(source.rss)}`);
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
-            const data = await response.json();
-            
-            if (data.status !== 'ok') {
-                throw new Error('RSS parsing failed');
-            }
-            
-            return data.items.map(item => ({
-                title: item.title,
-                description: this.cleanDescription(item.description),
-                link: item.link,
-                pubDate: item.pubDate,
-                source: source.name,
-                sourceColor: source.color,
-                thumbnail: item.thumbnail || item.enclosure?.link || null,
-                categories: item.categories || [],
-                id: this.generateId(item.link),
-                // إضافة اتجاه النص - الإنجليزية من اليسار لليمين
-                isEnglish: this.isEnglishContent(item.title, item.description),
-                textDirection: 'ltr' // فرض الاتجاه من اليسار لليمين للإنجليزية
-            }));
-            
-        } catch (error) {
-            console.error(`خطأ في جلب أخبار ${source.name}:`, error);
-            return [];
+   async fetchFromSource(source) {
+    try {
+        const proxyUrl = CONFIG.RSS_PROXY_SERVICES[0];
+        const response = await fetch(`${proxyUrl}${encodeURIComponent(source.rss)}`);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
+        
+        const data = await response.json();
+        
+        if (data.status !== 'ok') {
+            throw new Error('RSS parsing failed');
+        }
+        
+        return data.items.map(item => ({
+            title: item.title,
+            description: this.cleanDescription(item.description),
+            link: item.link,
+            pubDate: item.pubDate,
+            source: source.name,
+            sourceColor: source.color,
+            thumbnail: this.processThumbnail(item.thumbnail || item.enclosure?.link || null),
+            categories: item.categories || [],
+            id: this.generateId(item.link),
+            isEnglish: this.isEnglishContent(item.title, item.description),
+            textDirection: 'ltr'
+        }));
+        
+    } catch (error) {
+        console.error(`خطأ في جلب أخبار ${source.name}:`, error);
+        return [];
     }
-
+}
+// دالة جديدة لمعالجة الصور المصغرة
+processThumbnail(thumbnailUrl) {
+    if (!thumbnailUrl) return null;
+    
+    // التحقق من صحة الرابط
+    try {
+        new URL(thumbnailUrl);
+        return {
+            url: thumbnailUrl,
+            isValid: true
+        };
+    } catch (error) {
+        console.warn('رابط صورة غير صحيح:', thumbnailUrl);
+        return null;
+    }
+}
+// دالة لعرض الأخبار مع صور صغيرة على الجانب
+function updateNewsDisplayWithSideImages(newsService, newsArray) {
+    const container = document.getElementById('news-container');
+    
+    if (container) {
+        container.innerHTML = '';
+        
+        newsArray.forEach(newsItem => {
+            const newsElement = document.createElement('div');
+            newsElement.className = 'news-item english-content';
+            newsElement.style.direction = 'ltr';
+            newsElement.style.textAlign = 'left';
+            newsElement.style.display = 'flex';
+            newsElement.style.gap = '15px';
+            
+            // إنشاء HTML للصورة الجانبية
+            const thumbnailHTML = newsItem.thumbnail && newsItem.thumbnail.isValid ? 
+                `<div class="news-image-container" style="flex-shrink: 0;">
+                    <img src="${newsItem.thumbnail.url}" 
+                         alt="${newsItem.title}" 
+                         class="news-thumbnail-small"
+                         onerror="this.parentElement.style.display='none'"
+                         loading="lazy">
+                 </div>` : '';
+            
+            newsElement.innerHTML = `
+                ${thumbnailHTML}
+                <div class="news-content" style="flex: 1;">
+                    <div class="news-title" style="direction: ltr; text-align: left;">
+                        ${newsItem.title}
+                    </div>
+                    <div class="news-description" style="direction: ltr; text-align: left;">
+                        ${newsItem.description}
+                    </div>
+                    <div class="news-meta" style="direction: ltr; text-align: left;">
+                        <span class="news-source" style="color: ${newsItem.sourceColor}">
+                            ${newsItem.source}
+                        </span>
+                        <span class="news-date">
+                            ${new Date(newsItem.pubDate).toLocaleDateString()}
+                        </span>
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(newsElement);
+        });
+    }
+}
     // فحص إذا كان المحتوى باللغة الإنجليزية
     isEnglishContent(title, description) {
         const text = (title + ' ' + (description || '')).toLowerCase();
@@ -141,18 +204,19 @@ class NewsService {
     }
 
     // تنظيف وصف الخبر
-    cleanDescription(description) {
-        if (!description) return '';
-        
-        // إزالة HTML tags
-        const cleanText = description.replace(/<[^>]*>/g, '');
-        
-        // تقصير النص
-        return cleanText.length > 200 ? 
-            cleanText.substring(0, 200) + '...' : 
-            cleanText;
-    }
-
+   cleanDescription(description) {
+    if (!description) return '';
+    
+    // إزالة HTML tags والصور
+    let cleanText = description.replace(/<img[^>]*>/gi, ''); // إزالة تاغات الصور
+    cleanText = cleanText.replace(/<[^>]*>/g, ''); // إزالة باقي HTML tags
+    cleanText = cleanText.replace(/\[.*?\]/g, ''); // إزالة النصوص بين الأقواس المربعة
+    
+    // تقصير النص
+    return cleanText.length > 200 ? 
+        cleanText.substring(0, 200) + '...' : 
+        cleanText;
+}
     // توليد معرف فريد
     generateId(url) {
         return btoa(url).replace(/[^a-zA-Z0-9]/g, '').substring(0, 10);
