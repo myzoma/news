@@ -9,13 +9,55 @@ class CryptoNewsApp {
         this.newsService = new NewsService();
         this.currentNews = [];
         this.filteredNews = [];
-        this.currentPage = 1;
-        this.newsPerPage = 10;
-        this.isLoading = false;
+        this.displayedCount = 0;
+        this.itemsPerPage = 10;
         
         this.init();
     }
-
+ // أضف هذه الدالة
+    updateStats(news) {
+        console.log('🔄 Updating stats with', news.length, 'news items');
+        
+        const totalNewsElement = document.getElementById('totalNews');
+        const totalSourcesElement = document.getElementById('totalSources');
+        const lastUpdateElement = document.getElementById('lastUpdate');
+        
+        if (totalNewsElement) {
+            totalNewsElement.textContent = news.length;
+            console.log('✅ Total news updated:', news.length);
+        }
+        
+        if (totalSourcesElement) {
+            const uniqueSources = [...new Set(news.map(item => item.source))];
+            totalSourcesElement.textContent = uniqueSources.length;
+            console.log('✅ Total sources updated:', uniqueSources.length);
+        }
+        
+        if (lastUpdateElement) {
+            const lastUpdate = this.newsService.getFormattedLastUpdate();
+            lastUpdateElement.textContent = lastUpdate;
+            console.log('✅ Last update updated:', lastUpdate);
+        }
+    }
+    
+    // أضف دالة إخفاء التحميل
+    hideLoading() {
+        const loadingElement = document.getElementById('loadingSpinner');
+        if (loadingElement) {
+            loadingElement.style.display = 'none';
+            console.log('✅ Loading spinner hidden');
+        }
+    }
+    
+    // أضف دالة عرض التحميل
+    showLoading() {
+        const loadingElement = document.getElementById('loadingSpinner');
+        if (loadingElement) {
+            loadingElement.style.display = 'block';
+            console.log('🔄 Loading spinner shown');
+        }
+    }
+    
     async init() {
         this.setupEventListeners();
         this.showLoading();
@@ -62,22 +104,29 @@ class CryptoNewsApp {
         });
     }
 
-    async loadNews() {
+     async loadNews() {
         try {
-            this.isLoading = true;
-            this.currentNews = await this.newsService.fetchAllNews();
-            this.filteredNews = [...this.currentNews];
+            this.showLoading();
+            console.log('🔄 Loading news...');
             
-            this.displayNews();
-            this.updateLastUpdateTime();
-            this.updateSourceFilter();
+            const news = await this.newsService.fetchAllNews();
+            console.log('📰 News loaded:', news.length);
+            
+            this.currentNews = news;
+            this.filteredNews = news;
+            
+            // تحديث الإحصائيات
+            this.updateStats(news);
+            
+            // عرض الأخبار
+            this.displayNews(news);
+            
+            // إخفاء شاشة التحميل
             this.hideLoading();
             
         } catch (error) {
-            console.error('خطأ في تحميل الأخبار:', error);
-            this.showError('فشل في تحميل الأخبار');
-        } finally {
-            this.isLoading = false;
+            console.error('❌ Error loading news:', error);
+            this.hideLoading();
         }
     }
 
