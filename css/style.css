@@ -532,3 +532,55 @@ body {
 ::-webkit-scrollbar-thumb:hover {
     background: #0099cc;
 }
+/* إضافة أنماط CSS لاتجاه النص */
+.news-item {
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.news-item[data-direction="ltr"] {
+    direction: ltr;
+    text-align: left;
+}
+
+.news-item[data-direction="rtl"] {
+    direction: rtl;
+    text-align: right;
+}
+
+.news-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    line-height: 1.4;
+}
+
+.news-description {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 10px;
+}
+
+.news-meta {
+    font-size: 12px;
+    color: #999;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.news-item[data-direction="rtl"] .news-meta {
+    flex-direction: row-reverse;
+}
+
+.last-update {
+    font-size: 12px;
+    color: #666;
+    padding: 5px 10px;
+    background-color: #f5f5f5;
+    border-radius: 4px;
+    margin-bottom: 15px;
+}
