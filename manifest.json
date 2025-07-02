@@ -1,0 +1,22 @@
+{
+    "name": "أخبار العملات الرقمية",
+    "short_name": "CryptoNews",
+    "description": "آخر أخبار العملات الرقمية والبيتكوين",
+    "start_url": "./",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#3498db",
+    "orientation": "portrait-primary",
+    "icons": [
+        {
+            "src": "https://via.placeholder.com/192x192/3498db/ffffff?text=₿",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "https://via.placeholder.com/512x512/3498db/ffffff?text=₿",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}
