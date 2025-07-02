@@ -16,24 +16,7 @@
     
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="favicon.ico">
-    <style>
-/* إخفاء أي شيء يحتوي على نص التحميل */
-*:contains("جاري جلب"),
-*:contains("جاري التحميل"),
-.loading-spinner,
-.spinner-border,
-#loadingSpinner {
-    display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-    height: 0 !important;
-    width: 0 !important;
-    overflow: hidden !important;
-    position: absolute !important;
-    left: -99999px !important;
-    z-index: -1 !important;
-}
-</style>
+  
 </head>
 <body>
     <!-- Header -->
@@ -98,13 +81,7 @@
             </div>
         </div>
 
-        <!-- Loading Spinner -->
-        <div class="loading-spinner" id="loadingSpinner">
-            <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">جاري التحميل...</span>
-            </div>
-            <p>جاري جلب الأخبار...</p>
-        </div>
+      
 
         <!-- News Container -->
         <div class="news-container" id="newsContainer">
