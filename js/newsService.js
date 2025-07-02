@@ -33,6 +33,7 @@ class NewsService {
             // تخزين في الكاش
             this.cache.set('allNews', allNews);
             this.lastUpdate = new Date();
+            localStorage.setItem('lastUpdate', this.lastUpdate.toISOString());
             
             // حفظ في التخزين المحلي
             this.saveToLocalStorage(allNews);
