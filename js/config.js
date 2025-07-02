@@ -18,7 +18,7 @@ const CONFIG = {
         },
         bitcoinmagazine: {
     name: 'Bitcoin Magazine',
-    rss: 'https://bitcoinmagazine.com/rss/full/', // إزالة النقطة
+    rss: 'https://bitcoinmagazine.com/feed/'', // إزالة النقطة
     color: '#F7931A'
 },
 
