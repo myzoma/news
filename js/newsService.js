@@ -1,13 +1,21 @@
-// خدمة جلب الأخبار
 class NewsService {
     constructor() {
         this.cache = new Map();
         this.lastUpdate = null;
-        const lastUpdate = this.newsService.lastUpdate;
-if (lastUpdate) {
-    document.getElementById('lastUpdate').textContent = this.formatDate(lastUpdate.toISOString());
-}
         this.isLoading = false;
+
+        // فقط قراءة آخر تحديث من LocalStorage
+        const savedUpdate = localStorage.getItem('lastUpdate');
+        if (savedUpdate) {
+            this.lastUpdate = new Date(savedUpdate);
+        }
+    }
+
+    // عند تحديث الأخبار:
+    updateNewsCache(allNews) {
+        this.cache.set('allNews', allNews);
+        this.lastUpdate = new Date();
+        localStorage.setItem('lastUpdate', this.lastUpdate.toISOString());
     }
 
     // جلب الأخبار من جميع المصادر
