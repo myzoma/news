@@ -3,6 +3,10 @@ class NewsService {
     constructor() {
         this.cache = new Map();
         this.lastUpdate = null;
+        const lastUpdate = this.newsService.lastUpdate;
+if (lastUpdate) {
+    document.getElementById('lastUpdate').textContent = this.formatDate(lastUpdate.toISOString());
+}
         this.isLoading = false;
     }
 
