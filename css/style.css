@@ -561,3 +561,76 @@ body {
     text-align: left !important;
     unicode-bidi: embed;
 }
+/* أنماط إضافية للتحكم في حجم الصور */
+.news-item {
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+/* حاوية الصورة */
+.news-image-container {
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+}
+
+/* تأكد من أن الصور لا تكسر التخطيط */
+.news-thumbnail,
+.news-thumbnail-small,
+.news-thumbnail-large {
+    transition: transform 0.3s ease;
+    cursor: pointer;
+}
+
+.news-thumbnail:hover,
+.news-thumbnail-small:hover,
+.news-thumbnail-large:hover {
+    transform: scale(1.02);
+}
+
+/* للصور التالفة أو غير المتاحة */
+.news-thumbnail[src=""],
+.news-thumbnail-small[src=""],
+.news-thumbnail-large[src=""] {
+    display: none !important;
+}
+
+/* تحسين العرض على الشاشات المختلفة */
+@media (max-width: 1200px) {
+    .news-thumbnail {
+        max-height: 180px;
+    }
+}
+
+@media (max-width: 992px) {
+    .news-thumbnail {
+        max-height: 160px;
+    }
+    
+    .news-item[style*="display: flex"] {
+        flex-direction: column !important;
+    }
+    
+    .news-thumbnail-small {
+        max-width: 100% !important;
+        float: none !important;
+        margin: 0 0 10px 0 !important;
+    }
+}
+
+@media (max-width: 576px) {
+    .news-item {
+        padding: 12px;
+        margin-bottom: 12px;
+    }
+    
+    .news-thumbnail {
+        max-height: 140px;
+        border-radius: 6px;
+    }
+}
