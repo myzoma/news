@@ -1,0 +1,18 @@
+{
+  "name": "crypto-news-feed",
+  "version": "1.0.0",
+  "description": "خلاصة أخبار العملات الرقمية",
+  "main": "index.html",
+  "scripts": {
+    "start": "live-server",
+    "build": "npm run minify",
+    "minify": "terser js/app.js -o js/app.min.js"
+  },
+  "keywords": ["cryptocurrency", "news", "bitcoin", "blockchain"],
+  "author": "Your Name",
+  "license": "MIT",
+  "devDependencies": {
+    "live-server": "^1.2.2",
+    "terser": "^5.19.2"
+  }
+}
