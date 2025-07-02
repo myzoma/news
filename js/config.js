@@ -17,10 +17,11 @@ const CONFIG = {
             color: '#1DA1F2'
         },
         bitcoinmagazine: {
-            name: 'Bitcoin Magazine',
-            rss: 'https://bitcoinmagazine.com/.rss/full/',
-            color: '#F7931A'
-        },
+    name: 'Bitcoin Magazine',
+    rss: 'https://bitcoinmagazine.com/rss/full/', // إزالة النقطة
+    color: '#F7931A'
+},
+
         decrypt: {
             name: 'Decrypt',
             rss: 'https://decrypt.co/feed',
