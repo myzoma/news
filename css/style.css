@@ -7,7 +7,7 @@
     --bg-card: #252525;
     --text-light: #e0e0e0;
     --text-muted: #a0aec0;
-    --success-color: #00c853;
+    --success-color: #00c853;ب
     --danger-color: #ff3547;
     --info-color: #00bcd4;
     --warning-color: #ff9800;
@@ -532,55 +532,32 @@ body {
 ::-webkit-scrollbar-thumb:hover {
     background: #0099cc;
 }
-/* إضافة أنماط CSS لاتجاه النص */
+/* إضافة هذه الأنماط لإصلاح اتجاه النص */
 .news-item {
-    margin-bottom: 20px;
-    padding: 15px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-}
-
-.news-item[data-direction="ltr"] {
-    direction: ltr;
-    text-align: left;
-}
-
-.news-item[data-direction="rtl"] {
-    direction: rtl;
-    text-align: right;
+    direction: ltr !important;
+    text-align: left !important;
 }
 
 .news-title {
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 10px;
-    line-height: 1.4;
+    direction: ltr !important;
+    text-align: left !important;
+    font-family: Arial, sans-serif;
 }
 
 .news-description {
-    font-size: 14px;
-    color: #666;
-    line-height: 1.6;
-    margin-bottom: 10px;
+    direction: ltr !important;
+    text-align: left !important;
+    font-family: Arial, sans-serif;
 }
 
-.news-meta {
-    font-size: 12px;
-    color: #999;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.news-content {
+    direction: ltr !important;
+    text-align: left !important;
 }
 
-.news-item[data-direction="rtl"] .news-meta {
-    flex-direction: row-reverse;
-}
-
-.last-update {
-    font-size: 12px;
-    color: #666;
-    padding: 5px 10px;
-    background-color: #f5f5f5;
-    border-radius: 4px;
-    margin-bottom: 15px;
+/* للتأكد من أن جميع النصوص الإنجليزية تظهر من اليسار لليمين */
+.english-content {
+    direction: ltr !important;
+    text-align: left !important;
+    unicode-bidi: embed;
 }
