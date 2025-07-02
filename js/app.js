@@ -345,3 +345,16 @@ function resizeAllImages() {
 resizeAllImages();
 setInterval(resizeAllImages, 2000);
 
+// تهيئة تلقائية
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('🔄 Auto-initializing app...');
+    
+    if (typeof window.cryptoNewsApp === 'undefined') {
+        try {
+            window.cryptoNewsApp = new CryptoNewsApp();
+            console.log('✅ Auto-initialization successful');
+        } catch (error) {
+            console.error('❌ Auto-initialization failed:', error);
+        }
+    }
+});
