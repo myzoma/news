@@ -22,6 +22,80 @@ class NewsService {
             console.error('خطأ في تهيئة آخر تحديث:', error);
         }
     }
+// أضف هذه الدالة داخل class CryptoNewsApp
+
+displayNews(news, append = false) {
+    console.log('🔄 Displaying news:', news?.length || 0);
+    
+    const container = document.getElementById('newsContainer');
+    if (!container) {
+        console.error('❌ News container not found');
+        return;
+    }
+    
+    if (!append) {
+        container.innerHTML = '';
+    }
+    
+    if (!news || news.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-newspaper"></i>
+                <h3>لا توجد أخبار متاحة</h3>
+                <p>جاري تحميل الأخبار...</p>
+            </div>
+        `;
+        return;
+    }
+    
+    news.forEach((item, index) => {
+        const newsDiv = document.createElement('div');
+        newsDiv.className = 'news-item fade-in';
+        
+        const publishedDate = new Date(item.publishedAt || item.pubDate || Date.now());
+        const timeAgo = this.getTimeAgo ? this.getTimeAgo(publishedDate) : publishedDate.toLocaleDateString('ar-SA');
+        
+        newsDiv.innerHTML = `
+            <div class="news-source">${item.source || 'Unknown Source'}</div>
+            <h3 class="news-title">
+                <a href="${item.url || item.link || '#'}" target="_blank" rel="noopener noreferrer">
+                    ${item.title || 'No title available'}
+                </a>
+            </h3>
+            <p class="news-description">
+                ${item.description || item.summary || 'No description available'}
+            </p>
+            <div class="news-meta">
+                <span class="news-date">
+                    <i class="fas fa-clock"></i>
+                    ${timeAgo}
+                </span>
+                <div class="news-actions">
+                    <a href="${item.url || item.link || '#'}" target="_blank" class="btn btn-primary btn-sm">
+                        <i class="fas fa-external-link-alt"></i>
+                        Read More
+                    </a>
+                </div>
+            </div>
+        `;
+        
+        container.appendChild(newsDiv);
+    });
+    
+    console.log('✅ News displayed successfully');
+}
+
+// دالة مساعدة للوقت
+getTimeAgo(date) {
+    const now = new Date();
+    const diffTime = Math.abs(now - date);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 1) return 'منذ يوم واحد';
+    if (diffDays < 7) return `منذ ${diffDays} أيام`;
+    if (diffDays < 30) return `منذ ${Math.ceil(diffDays / 7)} أسابيع`;
+    return date.toLocaleDateString('ar-SA');
+}
 
     // إصلاح تحديث كاش الأخبار
     updateNewsCache(allNews) {
