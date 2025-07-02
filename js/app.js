@@ -42,12 +42,20 @@ class CryptoNewsApp {
     
     // أضف دالة إخفاء التحميل
     hideLoading() {
-        const loadingElement = document.getElementById('loadingSpinner');
-        if (loadingElement) {
-            loadingElement.style.display = 'none';
-            console.log('✅ Loading spinner hidden');
-        }
+    console.log('🔄 Force hiding loading spinner...');
+    
+    const loadingElement = document.getElementById('loadingSpinner');
+    if (loadingElement) {
+        // الحل الأقوى - إزالة كاملة
+        loadingElement.remove();
+        console.log('✅ Loading spinner removed completely');
+        
+        // تأكيد الإزالة
+        const check = document.getElementById('loadingSpinner');
+        console.log('Removal confirmed:', !check);
     }
+}
+
     
     // أضف دالة عرض التحميل
     showLoading() {
