@@ -17,11 +17,10 @@ const CONFIG = {
             color: '#1DA1F2'
         },
         bitcoinmagazine: {
-    name: 'Bitcoin Magazine',
-    rss: 'https://bitcoinmagazine.com/feed/'', // إزالة النقطة
-    color: '#F7931A'
-},
-
+            name: 'Bitcoin Magazine',
+            rss: 'https://bitcoinmagazine.com/feed/',
+            color: '#F7931A'
+        },
         decrypt: {
             name: 'Decrypt',
             rss: 'https://decrypt.co/feed',
@@ -39,7 +38,6 @@ const CONFIG = {
         LAST_UPDATE: 'lastUpdate'
     },
     
-    CACHE_DURATION: 5 * 60 * 1000, // 5 دقائق
-    
+    CACHE_DURATION: 5 * 60 * 1000,
     COINGECKO_API: 'https://api.coingecko.com/api/v3'
 };
