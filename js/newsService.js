@@ -72,7 +72,7 @@ class NewsService {
                 pubDate: item.pubDate,
                 source: source.name,
                 sourceColor: source.color,
-                thumbnail: this.optimizeImageUrl(item.thumbnail || item.enclosure?.link || null),
+                thumbnail: this.createThumbnail(item.thumbnail || item.enclosure?.link || null),
                 categories: item.categories || [],
                 id: this.generateId(item.link)
             }));
@@ -83,29 +83,38 @@ class NewsService {
         }
     }
 
-    // تحسين رابط الصورة للحصول على حجم مناسب
-    optimizeImageUrl(imageUrl) {
+    // إنشاء صورة مصغرة محسنة
+    createThumbnail(imageUrl) {
         if (!imageUrl) return null;
         
-        // إضافة معاملات لتصغير الصورة حسب الخدمة
+        // تحسين الصور حسب المصدر
         if (imageUrl.includes('youtube.com') || imageUrl.includes('ytimg.com')) {
-            return imageUrl.replace('maxresdefault', 'mqdefault');
+            return imageUrl.replace('maxresdefault', 'mqdefault').replace('hqdefault', 'mqdefault');
         }
         
-        // للصور العامة، يمكن استخدام خدمة تحسين الصور
-        return imageUrl;
+        if (imageUrl.includes('imgur.com')) {
+            return imageUrl.replace(/\.(jpg|jpeg|png|gif)$/i, 's$1');
+        }
+        
+        // للصور العامة - إضافة معاملات للحجم المصغر
+        const url = new URL(imageUrl);
+        url.searchParams.set('w', '80');
+        url.searchParams.set('h', '80');
+        url.searchParams.set('fit', 'crop');
+        
+        return url.toString();
     }
 
-    // تنظيف وصف الخبر
+    // تنظيف وصف الخبر مع مساحة أكبر للنص
     cleanDescription(description) {
         if (!description) return '';
         
         // إزالة HTML tags
         const cleanText = description.replace(/<[^>]*>/g, '');
         
-        // تقصير النص
-        return cleanText.length > 150 ? 
-            cleanText.substring(0, 150) + '...' : 
+        // تقصير النص مع إعطاء مساحة أكبر
+        return cleanText.length > 180 ? 
+            cleanText.substring(0, 180) + '...' : 
             cleanText;
     }
 
