@@ -96,13 +96,8 @@ class NewsService {
             return imageUrl.replace(/\.(jpg|jpeg|png|gif)$/i, 's$1');
         }
         
-        // للصور العامة - إضافة معاملات للحجم المصغر
-        const url = new URL(imageUrl);
-        url.searchParams.set('w', '80');
-        url.searchParams.set('h', '80');
-        url.searchParams.set('fit', 'crop');
-        
-        return url.toString();
+        // للصور العامة
+        return imageUrl;
     }
 
     // تنظيف وصف الخبر مع مساحة أكبر للنص
