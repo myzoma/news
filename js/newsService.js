@@ -72,7 +72,7 @@ class NewsService {
                 pubDate: item.pubDate,
                 source: source.name,
                 sourceColor: source.color,
-                thumbnail: item.thumbnail || item.enclosure?.link || null,
+                thumbnail: this.optimizeImageUrl(item.thumbnail || item.enclosure?.link || null),
                 categories: item.categories || [],
                 id: this.generateId(item.link)
             }));
@@ -83,6 +83,19 @@ class NewsService {
         }
     }
 
+    // تحسين رابط الصورة للحصول على حجم مناسب
+    optimizeImageUrl(imageUrl) {
+        if (!imageUrl) return null;
+        
+        // إضافة معاملات لتصغير الصورة حسب الخدمة
+        if (imageUrl.includes('youtube.com') || imageUrl.includes('ytimg.com')) {
+            return imageUrl.replace('maxresdefault', 'mqdefault');
+        }
+        
+        // للصور العامة، يمكن استخدام خدمة تحسين الصور
+        return imageUrl;
+    }
+
     // تنظيف وصف الخبر
     cleanDescription(description) {
         if (!description) return '';
@@ -91,8 +104,8 @@ class NewsService {
         const cleanText = description.replace(/<[^>]*>/g, '');
         
         // تقصير النص
-        return cleanText.length > 200 ? 
-            cleanText.substring(0, 200) + '...' : 
+        return cleanText.length > 150 ? 
+            cleanText.substring(0, 150) + '...' : 
             cleanText;
     }
 
